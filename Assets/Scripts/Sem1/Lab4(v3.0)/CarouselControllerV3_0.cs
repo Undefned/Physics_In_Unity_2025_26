@@ -203,7 +203,6 @@ public class CarouselControllerV3_0 : MonoBehaviour
             if (horizontalOffset.sqrMagnitude > 0.0005f)
             {
                 Vector3 torque = Vector3.Cross(horizontalOffset, preservedAngularMomentum);
-                Vector3 momentumLocal = transform.InverseTransformDirection(preservedAngularMomentum);
                 float epsilon = 1e-3f;
 
                 // Эффективные моменты инерции (избегаем деления на ноль)
@@ -228,7 +227,7 @@ public class CarouselControllerV3_0 : MonoBehaviour
         }
 
         // Ограничение углов наклона для стабильности
-        float maximumTilt = 15f * Mathf.Deg2Rad;
+        float maximumTilt = 20f * Mathf.Deg2Rad;
         currentAngularVelocity.x = Mathf.Clamp(currentAngularVelocity.x, -maximumTilt, maximumTilt);
         currentAngularVelocity.z = Mathf.Clamp(currentAngularVelocity.z, -maximumTilt, maximumTilt);
 

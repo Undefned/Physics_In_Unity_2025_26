@@ -3,7 +3,7 @@
 public class MassObjectV3_0 : MonoBehaviour
 {
     [Header("Параметры объекта")]
-    public float mass = 30f;              // Масса объекта в кг
+    public float mass = 40f;              // Масса объекта в кг
     public Material normalMat;           // Материал в обычном состоянии
     public Material selectedMat;         // Материал при выделении
 

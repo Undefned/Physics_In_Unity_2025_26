@@ -2306,6 +2306,7 @@ MonoBehaviour:
   - {fileID: 1143922565}
   activeScenario: 1
   statusDisplay: {fileID: 527236716}
+  angularDrag: 0.1
 --- !u!153 &1696542921
 ConfigurableJoint:
   m_ObjectHideFlags: 0
