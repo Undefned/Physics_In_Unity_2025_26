@@ -24,7 +24,7 @@ public class Cathode : MonoBehaviour
             currentMaterial = availableMaterials[index];
             workFunction = currentMaterial.workFunction;
             var color = currentMaterial.cathodeColor;
-            meshRenderer.material.color = new UnityEngine.Color(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
+            // meshRenderer.material.color = new Color(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
 
             Debug.Log($"Материал: {currentMaterial.name}, Работа выхода: {workFunction} эВ");
         }

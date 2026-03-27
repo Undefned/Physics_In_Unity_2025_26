@@ -33,9 +33,10 @@ public class LightSource : MonoBehaviour
     void Update()
     {
         // Генерация фотонов с частотой, зависящей от интенсивности
-        float photonsPerSecond = intensity * 10f;
+        // Уменьшено в 3 раза для меньшей плотности электронов
+        float photonsPerSecond = intensity * 1f;
         float timeBetweenPhotons = 1f / Mathf.Max(1, photonsPerSecond);
-        
+
         timer += Time.deltaTime;
         while (timer >= timeBetweenPhotons)
         {
@@ -47,18 +48,17 @@ public class LightSource : MonoBehaviour
     void EmitPhoton()
     {
         if (cathode == null) return;
-        
+
         // Проверяем, может ли фотон выбить электрон
         if (cathode.CanEjectElectron(photonEnergy))
         {
             // Вычисляем кинетическую энергию электрона
             float kineticEnergyEV = cathode.GetKineticEnergy(photonEnergy);
-            float kineticEnergyJ = kineticEnergyEV * eVToJoule;
             
-            // Вычисляем скорость электрона
-            float electronMass = 9.11e-31f;
-            float velocity = Mathf.Sqrt(2 * kineticEnergyJ / electronMass);
-            
+            // Вычисляем скорость электрона (масштабированную для Unity)
+            // Уменьшено для лучшей видимости
+            float velocity = Mathf.Sqrt(kineticEnergyEV) * 2f;
+
             // Создаём визуализацию электрона
             SpawnElectron(velocity);
         }
@@ -72,44 +72,55 @@ public class LightSource : MonoBehaviour
     void SpawnElectron(float velocity)
     {
         if (electronPrefab == null) return;
-        
-        GameObject electron = Instantiate(electronPrefab, cathode.transform.position + Vector3.right * 0.5f, Quaternion.identity);
+
+        // Спавн электрона от поверхности катода в направлении к аноду
+        Vector3 spawnDir = (anodeTransform.position - cathode.transform.position).normalized;
+        Vector3 spawnPos = cathode.transform.position + spawnDir * 0.3f;
+        GameObject electron = Instantiate(electronPrefab, spawnPos, Quaternion.identity);
+
         ElectronMovement movement = electron.GetComponent<ElectronMovement>();
         if (movement != null)
         {
             movement.velocity = velocity;
             movement.anode = anodeTransform;
         }
-        
-        Destroy(electron, 2f); // самоуничтожение через 2 секунды
+
+        Destroy(electron, 5f); // самоуничтожение через 5 секунд
     }
     
     public void UpdateWavelength()
     {
         wavelength = Mathf.Clamp(wavelength, 200f, 800f);
-        
+
         // Вычисляем энергию фотона в эВ
         // E = h*c/λ, результат в джоулях, переводим в эВ
         float wavelengthM = wavelength * 1e-9f;
         float energyJ = (h * c) / wavelengthM;
         photonEnergy = energyJ / eVToJoule;
-        
+
         // Меняем цвет источника света
         Color lightColor = WavelengthToColor(wavelength);
-        pointLight.color = lightColor;
+        Debug.Log($"[LightSource] WavelengthToColor: {lightColor}");
         
+        if (pointLight != null)
+            pointLight.color = lightColor;
+        else
+            Debug.LogWarning("[LightSource] pointLight не назначен!");
+
         // Меняем цвет сферы (источника)
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
             renderer.material.color = lightColor;
-        
-        Debug.Log($"Длина волны: {wavelength} нм, Энергия фотона: {photonEnergy:F2} эВ");
+        else
+            Debug.LogWarning("[LightSource] Renderer не найден!");
+
+        Debug.Log($"[LightSource] Длина волны: {wavelength} нм, Энергия фотона: {photonEnergy:F2} эВ");
     }
     
     Color WavelengthToColor(float wavelength)
     {
         // Приближённое преобразование длины волны в цвет
-        if (wavelength < 380) return Color.white;
+        if (wavelength < 380) return Color.black;
         if (wavelength < 440) return new Color(0.5f, 0f, 1f);
         if (wavelength < 490) return new Color(0f, 0.5f, 1f);
         if (wavelength < 510) return new Color(0f, 1f, 0.5f);
@@ -122,12 +133,14 @@ public class LightSource : MonoBehaviour
     
     public void SetWavelength(float value)
     {
+        Debug.Log($"[LightSource] SetWavelength: {value} нм");
         wavelength = value;
         UpdateWavelength();
     }
-    
+
     public void SetIntensity(float value)
     {
+        Debug.Log($"[LightSource] SetIntensity: {value}");
         intensity = value;
         if (pointLight != null)
             pointLight.intensity = value / 20f;

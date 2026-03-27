@@ -12,6 +12,7 @@ TagManager:
   - CueBall
   - BilliardPocket
   - Particle
+  - Anode
   layers:
   - Default
   - TransparentFX

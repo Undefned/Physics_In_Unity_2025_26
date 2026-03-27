@@ -37,6 +37,7 @@ public class Anode : MonoBehaviour
     public void CollectElectron()
     {
         electronCount++;
+        Debug.Log($"[Anode] Electron collected! Count={electronCount}, current={current}");
     }
     
     public float GetCurrent() => current;

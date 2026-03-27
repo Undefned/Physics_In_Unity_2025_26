@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.694, y: -1.679, z: -1.579}
-  m_LocalScale: {x: 0.027923577, y: 0.027923577, z: 0.027923577}
+  m_LocalScale: {x: 0.034438144, y: 0.034438144, z: 0.034438144}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -107,12 +107,12 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.52563953
+  m_Center: {x: 0, y: 0, z: 0.007906175}
 --- !u!114 &2930178478577011061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +127,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ElectronMovement
   velocity: 10
   anode: {fileID: 0}
-  voltage: 0
 --- !u!54 &8024842297120843237
 Rigidbody:
   m_ObjectHideFlags: 0
