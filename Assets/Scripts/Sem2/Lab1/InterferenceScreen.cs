@@ -52,25 +52,19 @@ public class InterferenceScreen : MonoBehaviour
         float source2X = distanceBetweenSources / 2f;
         float fringeWidth = (wavelength * distanceToScreen) / distanceBetweenSources;
 
-        // Максимально возможная интенсивность (если бы оба источника были в фазе и с max амплитудой)
-        float globalMaxPossible = 4f; // когда A1=2, A2=2, cos=1 → (2+2)²=16, но мы нормируем хитро
-        
-        // ДЛЯ ОТОБРАЖЕНИЯ В ТЕКСТЕ
-        float contrastValue = (amplitude1 == 0 || amplitude2 == 0) ? 0 : 
-                               (amplitude1 + amplitude2) * (amplitude1 + amplitude2) - 
-                               (amplitude1 - amplitude2) * (amplitude1 - amplitude2);
-        contrastValue = Mathf.Clamp01(contrastValue / 4f);
-        
+        float wavelengthNM = 400f + (wavelength - 0.2f) * (300f / 1.0f);  // диапазон 400-700 нм
+        float distanceMM = distanceBetweenSources;  // уже в мм (0.3-4.0)
+        float fringeWidthMM = (wavelengthNM * 1e-6f * distanceToScreen) / (distanceMM * 0.001f) * 1000f;
+
         if (infoText != null)
         {
             infoText.text = $"ИНТЕРФЕРЕНЦИЯ ДВУХ ИСТОЧНИКОВ\n" +
-                           $"λ (длина волны) ........ {wavelength:F2}\n" +
-                           $"d (между источниками) ... {distanceBetweenSources:F2}\n" +
-                           $"L (до экрана) .......... {distanceToScreen:F2}\n" +
-                           $"A1 (сила 1-го) .......... {amplitude1:F2}\n" +
-                           $"A2 (сила 2-го) .......... {amplitude2:F2}\n" +
-                           $"Ширина полосы = λ·L / d = {fringeWidth:F3}\n" +
-                           $"Желтый = максимум | Черный = минимум";
+                        $"λ (длина волны) ........ {wavelengthNM:F0} нм\n" +
+                        $"d (между источниками) ... {distanceMM:F1} мм\n" +
+                        $"L (до экрана) .......... {distanceToScreen:F2} м\n" +
+                        $"A1 (амплитуда 1-го) ..... {amplitude1:F2}\n" +
+                        $"A2 (амплитуда 2-го) ..... {amplitude2:F2}\n" +
+                        $"Ширина полосы = λ·L / d = {fringeWidthMM:F2} мм\n";
         }
 
         for (int i = 0; i < resolution; i++)

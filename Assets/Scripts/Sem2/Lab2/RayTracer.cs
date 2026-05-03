@@ -32,7 +32,7 @@ public class RayTracer : MonoBehaviour
 
     [Header("Ray Params")]
     [Min(1)] public int maxInteractions = 12;
-    [Min(0.1f)] public float maxDistance = 60f;
+    [Min(0.1f)] public float maxDistance = 30f;
     [Min(1f)] public float defaultRefractiveIndex = 1.0f;
     [Min(0.0001f)] public float rayOffset = 0.002f;
 
