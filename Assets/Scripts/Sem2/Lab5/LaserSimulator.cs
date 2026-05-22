@@ -88,7 +88,7 @@ public class LaserSimulator : MonoBehaviour
     
     void OnPowerChanged(float value)
     {
-        pumpPower = value;
+        pumpPower = value / 100f;
         powerValueText.text = $"{value:F0}%";
     }
     

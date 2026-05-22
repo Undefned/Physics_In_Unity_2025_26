@@ -8,11 +8,13 @@ public class VisualizationManager : MonoBehaviour
     public GameObject atomPrefab;
     public int atomCount = 20;
     public RectTransform atomContainer;
-    public Color normalAtomColor = Color.blue;
-    public Color excitedAtomColor = Color.yellow;
+    public Color normalColor = Color.blue;
+    public Color excitedColor = Color.yellow;
     
-    [Header("Фотоны (ParticleSystem)")]
-    public ParticleSystem photonParticles;
+    [Header("Фотоны")]
+    public GameObject photonPrefab;
+    public RectTransform photonContainer;
+    public int photonCount = 15;
     
     [Header("Лазерный луч")]
     public LineRenderer laserBeam;
@@ -22,152 +24,150 @@ public class VisualizationManager : MonoBehaviour
     [Header("Ссылки")]
     public LaserSimulator simulator;
     
-    private List<Image> atomImages = new List<Image>();
-    private float currentInversion = 0;
-    private bool isLasing = false;
-    private ParticleSystem.EmissionModule photonEmission;
+    private List<Image> atoms = new List<Image>();
+    private List<RectTransform> photons = new List<RectTransform>();
+    private float photonTimer = 0;
     
     void Start()
     {
         CreateAtoms();
+        CreatePhotons();
         
         if (simulator != null)
-        {
-            simulator.OnSimulationUpdate += OnSimulationUpdate;
-        }
+            simulator.OnSimulationUpdate += OnUpdate;
         
-        // Настройка ParticleSystem
-        if (photonParticles != null)
-        {
-            photonEmission = photonParticles.emission;
-            photonEmission.rateOverTime = 0;
-            photonParticles.Stop();
-        }
-        
-        // Настройка луча
         if (laserBeam != null)
         {
             laserBeam.enabled = false;
-            laserBeam.startWidth = 0.05f;
-            laserBeam.endWidth = 0.05f;
-            // Создаём простой материал для луча если его нет
+            laserBeam.startWidth = 0.1f;
+            laserBeam.endWidth = 0.1f;
+            laserBeam.startColor = Color.yellow;
+            laserBeam.endColor = Color.red;
+            
             if (laserBeam.material == null)
-            {
                 laserBeam.material = new Material(Shader.Find("Sprites/Default"));
-                laserBeam.startColor = Color.green;
-                laserBeam.endColor = Color.red;
-            }
         }
     }
     
     void CreateAtoms()
     {
-        if (atomPrefab == null || atomContainer == null) return;
+        if (atomPrefab == null || atomContainer == null)
+        {
+            Debug.LogError("AtomPrefab или AtomContainer не назначен!");
+            return;
+        }
+        
+        float w = atomContainer.rect.width;
+        float h = atomContainer.rect.height;
         
         for (int i = 0; i < atomCount; i++)
         {
             GameObject atom = Instantiate(atomPrefab, atomContainer);
             RectTransform rect = atom.GetComponent<RectTransform>();
-            Image img = atom.GetComponent<Image>();
-            
-            if (rect != null)
-            {
-                rect.anchoredPosition = new Vector2(
-                    Random.Range(50, atomContainer.rect.width - 50),
-                    Random.Range(50, atomContainer.rect.height - 50)
-                );
-            }
-            
-            if (img != null)
-            {
-                atomImages.Add(img);
-                img.color = normalAtomColor;
-            }
+            rect.anchoredPosition = new Vector2(
+                Random.Range(-w/2 + 30, w/2 - 30),
+                Random.Range(-h/2 + 30, h/2 - 30)
+            );
+            atoms.Add(atom.GetComponent<Image>());
+        }
+        
+        Debug.Log($"Создано атомов: {atoms.Count}");
+    }
+    
+    void CreatePhotons()
+    {
+        if (photonPrefab == null || photonContainer == null)
+        {
+            Debug.LogWarning("PhotonPrefab или PhotonContainer не назначен!");
+            return;
+        }
+        
+        for (int i = 0; i < photonCount; i++)
+        {
+            GameObject p = Instantiate(photonPrefab, photonContainer);
+            RectTransform rect = p.GetComponent<RectTransform>();
+            rect.anchoredPosition = new Vector2(-500, 0); // Все на одной высоте
+            photons.Add(rect);
+            p.SetActive(false);
         }
     }
     
-    void OnSimulationUpdate(float inversion, bool lasing)
+    void OnUpdate(float inversion, bool lasing)
     {
-        currentInversion = inversion;
-        isLasing = lasing;
+        // Атомы
+        float t = Mathf.Clamp01(inversion / 2f);
+        int excited = Mathf.FloorToInt(atoms.Count * t);
+        for (int i = 0; i < atoms.Count; i++)
+            if (atoms[i] != null)
+                atoms[i].color = (i < excited) ? excitedColor : normalColor;
         
-        // 1. Обновляем цвета атомов (чем выше инверсия, тем больше жёлтых)
-        UpdateAtomColors();
-        
-        // 2. Обновляем фотоны (ParticleSystem)
-        UpdatePhotons();
-        
-        // 3. Обновляем лазерный луч
-        UpdateLaserBeam();
-    }
-    
-    void UpdateAtomColors()
-    {
-        if (atomImages.Count == 0) return;
-        
-        // Нормализуем инверсию (0 - нет возбуждения, 1 - полностью возбуждены)
-        float t = Mathf.Clamp01(currentInversion / 2f);
-        int excitedCount = Mathf.FloorToInt(atomImages.Count * t);
-        
-        for (int i = 0; i < atomImages.Count; i++)
+        // Фотоны
+        if (lasing)
         {
-            if (atomImages[i] != null)
+            photonTimer += Time.deltaTime;
+            if (photonTimer > 0.03f)
             {
-                atomImages[i].color = (i < excitedCount) ? excitedAtomColor : normalAtomColor;
+                photonTimer = 0;
+                foreach (var photon in photons)
+                {
+                    if (!photon.gameObject.activeSelf)
+                    {
+                        photon.gameObject.SetActive(true);
+                        photon.anchoredPosition = new Vector2(-500, 0);
+                        break;
+                    }
+                    else
+                    {
+                        Vector2 pos = photon.anchoredPosition;
+                        pos.x += 80; // Быстрее
+                        if (pos.x > 500)
+                            photon.gameObject.SetActive(false);
+                        else
+                            photon.anchoredPosition = pos;
+                    }
+                }
             }
-        }
-    }
-    
-    void UpdatePhotons()
-    {
-        if (photonParticles == null) return;
-        
-        if (isLasing)
-        {
-            // Включаем частицы если они не играют
-            if (!photonParticles.isPlaying)
-            {
-                photonParticles.Play();
-            }
-            
-            // Чем выше инверсия, тем больше фотонов
-            float rate = Mathf.Lerp(10f, 100f, Mathf.Clamp01(currentInversion));
-            photonEmission.rateOverTime = rate;
         }
         else
         {
-            // Останавливаем частицы
-            if (photonParticles.isPlaying)
-            {
-                photonParticles.Stop();
-            }
-            photonEmission.rateOverTime = 0;
+            foreach (var p in photons)
+                if (p.gameObject.activeSelf) p.gameObject.SetActive(false);
         }
-    }
-    
-    void UpdateLaserBeam()
-    {
-        if (laserBeam == null) return;
         
-        laserBeam.enabled = isLasing;
-        
-        if (isLasing && beamStart != null && beamEnd != null)
+        // Луч
+        if (laserBeam != null)
         {
-            laserBeam.SetPosition(0, beamStart.position);
-            laserBeam.SetPosition(1, beamEnd.position);
+            laserBeam.enabled = lasing;
+            if (lasing && beamStart != null && beamEnd != null)
+            {
+                laserBeam.SetPosition(0, beamStart.position);
+                laserBeam.SetPosition(1, beamEnd.position);
+                Debug.Log($"Луч: {beamStart.position} → {beamEnd.position}");
+            }
+        }
+
+
+        // ТЕСТ ЛУЧА (всегда включён)
+        if (laserBeam != null)
+        {
+            laserBeam.enabled = true;  // принудительно
             
-            // Меняем цвет в зависимости от мощности генерации
-            float intensity = Mathf.Clamp01(currentInversion);
-            laserBeam.startColor = new Color(1 - intensity, intensity, 0);
-            laserBeam.endColor = new Color(1 - intensity * 0.5f, intensity * 0.8f, 0);
+            if (beamStart != null && beamEnd != null)
+            {
+                laserBeam.SetPosition(0, beamStart.position);
+                laserBeam.SetPosition(1, beamEnd.position);
+                Debug.Log($"Луч включен! Start: {beamStart.position}, End: {beamEnd.position}");
+            }
+            else
+            {
+                Debug.LogError("beamStart или beamEnd не назначены!");
+            }
         }
     }
     
     void OnDestroy()
     {
         if (simulator != null)
-        {
-            simulator.OnSimulationUpdate -= OnSimulationUpdate;
-        }
+            simulator.OnSimulationUpdate -= OnUpdate;
     }
 }

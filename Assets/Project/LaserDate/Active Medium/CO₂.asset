@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50c23ab297a7d40b7007307bdb4360, type: 3}
   m_Name: "CO\u2082"
   m_EditorClassIdentifier: Assembly-CSharp::ActiveMedium
-  mediumName: "CO\u2082"
+  mediumName: CO2
   wavelength: 10600
   lifetime: 12
   thresholdInversion: 0.5
