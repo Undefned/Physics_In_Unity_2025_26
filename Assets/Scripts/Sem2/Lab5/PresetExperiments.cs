@@ -82,7 +82,7 @@ public class PresetExperiments : MonoBehaviour
                          $"Активная среда: {simulator.currentMedium.mediumName}\n" +
                          $"Накачка: {simulator.currentPump.pumpName}\n" +
                          $"Резонатор: {simulator.currentResonator.resonatorName}\n" +
-                         $"Мощность: {simulator.pumpPower}%\n" +
+                         $"Мощность: {simulator.pumpPower*100f}%\n" +
                          $"Инверсия: {simulator.currentInversion:F3}\n" +
                          $"Генерация: {(simulator.isLasing ? "ДА" : "НЕТ")}\n";
         

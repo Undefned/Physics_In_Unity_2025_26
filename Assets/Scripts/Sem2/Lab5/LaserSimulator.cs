@@ -25,7 +25,7 @@ public class LaserSimulator : MonoBehaviour
     public GameObject generationIndicator; // зеленый/красный индикатор
     
     [Header("Параметры симуляции")]
-    [Range(0, 1)] public float pumpPower = 0; // 0-100%
+    [Range(0, 300)] public float pumpPower = 0; // 0-100%
     public bool isSimulating = false;
     public float updateInterval = 0.05f; // 20 раз в секунду
     
@@ -132,8 +132,7 @@ public class LaserSimulator : MonoBehaviour
         
         // 4. Проверка порога генерации
         bool thresholdReached = currentInversion >= currentMedium.thresholdInversion;
-        bool mediumActive = currentMedium.schemeType == ActiveMedium.SchemeType.FourLevel || 
-                            (currentMedium.schemeType == ActiveMedium.SchemeType.ThreeLevel && currentInversion >= currentMedium.thresholdInversion * 1.5f);
+        bool mediumActive = currentInversion >= currentMedium.thresholdInversion;
         
         isLasing = compatible && stable && thresholdReached && mediumActive;
         
@@ -165,43 +164,43 @@ public class LaserSimulator : MonoBehaviour
     
     public float CalculateInversion(ActiveMedium medium, PumpType pump, float powerPercent)
     {
-        float normalizedPower = Mathf.Clamp01(powerPercent);
+        // НЕ обрезаем мощность для 3-уровневых сред
+        float normalizedPower = powerPercent;
         
         // Базовая инверсия: мощность * КПД накачки * базовый множитель
-        float inversion = normalizedPower * pump.powerCoefficient * 1.2f;  // +20% для запаса
+        float inversion = normalizedPower * pump.powerCoefficient * 1.2f;
         
         // Для 3-уровневой схемы (рубин) снижаем КПД
         if (medium.schemeType == ActiveMedium.SchemeType.ThreeLevel)
             inversion *= 0.5f;
         
-        // Ограничиваем разумным максимумом
-        inversion = Mathf.Min(inversion, 2.0f);
+        // Ограничиваем разумным максимумом (для 3-уровневых можно выше)
+        if (medium.schemeType == ActiveMedium.SchemeType.ThreeLevel)
+            inversion = Mathf.Min(inversion, 5.0f);  // до 500%
+        else
+            inversion = Mathf.Min(inversion, 2.0f);
         
         return inversion;
     }
         
     public bool CheckResonatorStability(ResonatorType resonator)
     {
-        // Для бесконечности (плоское зеркало) используем g = 1
         float g1 = (resonator.R1 >= 999998) ? 1f : (1f - resonator.length / resonator.R1);
         float g2 = (resonator.R2 >= 999998) ? 1f : (1f - resonator.length / resonator.R2);
         float product = g1 * g2;
         
-        // Диапазон устойчивости: 0 < g1*g2 < 1
-        // НЕ включаем границы (0 и 1) - они неустойчивы
-        bool stable = (product > 0.001f && product < 0.999f);
-        
-        // Для отладки - выводим в консоль
-        Debug.Log($"Resonator: {resonator.resonatorName}, g1={g1:F3}, g2={g2:F3}, product={product:F3}, stable={stable}");
+        bool stable = (Mathf.Abs(product - 0.25f) < 0.01f) ||   // Конфокальный
+                    (resonator.resonatorName == "Полусферический") ||
+                    (resonator.resonatorName == "Кольцевой"); 
         
         return stable;
     }
-    
+        
     public float CalculateBeamDivergence(float wavelengthNm, float waistRadiusMm)
     {
         // θ = λ / (π * w0)
         float wavelengthMm = wavelengthNm / 1_000_000f; // nm -> mm
-        float divergence = wavelengthMm / (Mathf.PI * waistRadiusMm);
+        float divergence = (2 * wavelengthMm) / (Mathf.PI * waistRadiusMm);
         return divergence;
     }
     

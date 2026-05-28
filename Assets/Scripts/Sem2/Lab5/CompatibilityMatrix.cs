@@ -30,8 +30,8 @@ public class CompatibilityMatrix : ScriptableObject
             }
         }
         
-        // По умолчанию совместимы, но с предупреждением
+        // По умолчанию не совместимы, но с предупреждением
         reason = "Совместимость явно не определена в матрице";
-        return true;
+        return false;
     }
 }

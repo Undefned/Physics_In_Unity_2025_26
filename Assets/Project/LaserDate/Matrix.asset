@@ -22,8 +22,21 @@ MonoBehaviour:
     pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
     isCompatible: 1
     reasonIfNotCompatible: 
+  - mediumName: He-Ne
+    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F CW"
+    isCompatible: 0
+    reasonIfNotCompatible: "\u043D\u0443\u0436\u0435\u043D \u0440\u0430\u0437\u0440\u044F\u0434,
+      \u043D\u0435 \u0434\u0438\u043E\u0434"
+  - mediumName: He-Ne
+    pumpName: "\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0430\u044F"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: He-Ne
+    pumpName: "\u0414\u0440\u0443\u0433\u043E\u0439 \u043B\u0430\u0437\u0435\u0440"
+    isCompatible: 1
+    reasonIfNotCompatible: 
   - mediumName: GaAs
-    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F"
+    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F CW"
     isCompatible: 1
     reasonIfNotCompatible: 
   - mediumName: GaAs
@@ -32,44 +45,77 @@ MonoBehaviour:
     reasonIfNotCompatible: 
   - mediumName: GaAs
     pumpName: "\u041B\u0430\u043C\u043F\u043E\u0432\u0430\u044F \u0438\u043C\u043F\u0443\u043B\u044C\u0441\u043D\u0430\u044F"
-    isCompatible: 1
+    isCompatible: 0
     reasonIfNotCompatible: "\u041F\u043E\u043B\u0443\u043F\u0440\u043E\u0432\u043E\u0434\u043D\u0438\u043A\u043E\u0432\u044B\u0439
       \u043B\u0430\u0437\u0435\u0440 \u043F\u0435\u0440\u0435\u0433\u043E\u0440\u0438\u0442
       \u043E\u0442 \u043B\u0430\u043C\u043F\u044B"
-  - mediumName: "\u0420\u0443\u0431\u0438\u043D"
+  - mediumName: GaAs
+    pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: GaAs
+    pumpName: "\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0430\u044F"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: Rubin
     pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
     isCompatible: 0
     reasonIfNotCompatible: "\u0420\u0443\u0431\u0438\u043D\u0443 \u043D\u0443\u0436\u043D\u0430
       \u043C\u043E\u0449\u043D\u0430\u044F \u0438\u043C\u043F\u0443\u043B\u044C\u0441\u043D\u0430\u044F
       \u043B\u0430\u043C\u043F\u0430"
-  - mediumName: "\u0420\u0443\u0431\u0438\u043D"
+  - mediumName: Rubin
     pumpName: "\u041B\u0430\u043C\u043F\u043E\u0432\u0430\u044F \u0438\u043C\u043F\u0443\u043B\u044C\u0441\u043D\u0430\u044F"
     isCompatible: 1
     reasonIfNotCompatible: 
-  - mediumName: Nd:YAG
-    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F"
+  - mediumName: Rubin
+    pumpName: "\u0414\u0440\u0443\u0433\u043E\u0439 \u043B\u0430\u0437\u0435\u0440"
     isCompatible: 1
+    reasonIfNotCompatible: "\u0411\u0435\u0441\u0441\u043C\u044B\u0441\u043B\u0435\u043D\u043D\u043E!"
+  - mediumName: Rubin
+    pumpName: "\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0430\u044F"
+    isCompatible: 0
     reasonIfNotCompatible: 
-  - mediumName: Nd:YAG
+  - mediumName: Rubin
+    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F CW"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: NdYAG
+    pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: NdYAG
     pumpName: "\u041B\u0430\u043C\u043F\u043E\u0432\u0430\u044F \u0438\u043C\u043F\u0443\u043B\u044C\u0441\u043D\u0430\u044F"
     isCompatible: 1
     reasonIfNotCompatible: 
-  - mediumName: Nd:YAG
-    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F"
+  - mediumName: NdYAG
+    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F CW"
     isCompatible: 1
     reasonIfNotCompatible: 
-  - mediumName: "CO\u2082"
+  - mediumName: NdYAG
+    pumpName: "\u0414\u0440\u0443\u0433\u043E\u0439 \u043B\u0430\u0437\u0435\u0440"
+    isCompatible: 1
+    reasonIfNotCompatible: 
+  - mediumName: NdYAG
+    pumpName: "\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0438\u0439"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: CO2
     pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
     isCompatible: 1
     reasonIfNotCompatible: 
-  - mediumName: "CO\u2082"
-    pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
+  - mediumName: CO2
+    pumpName: "\u041B\u0430\u043C\u043F\u043E\u0432\u0430\u044F \u0438\u043C\u043F\u0443\u043B\u044C\u0441\u043D\u0430\u044F"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: CO2
+    pumpName: "\u0414\u0438\u043E\u0434\u043D\u0430\u044F CW"
+    isCompatible: 0
+    reasonIfNotCompatible: 
+  - mediumName: CO2
+    pumpName: "\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0430\u044F"
     isCompatible: 1
     reasonIfNotCompatible: 
-  - mediumName: "CO\u2082"
-    pumpName: "\u0413\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434"
+  - mediumName: CO2
+    pumpName: "\u0414\u0440\u0443\u0433\u043E\u0439 \u043B\u0430\u0437\u0435\u0440"
     isCompatible: 1
-    reasonIfNotCompatible: "CO\u2082 \u043B\u0430\u0437\u0435\u0440\u0443 \u043D\u0443\u0436\u0435\u043D
-      \u0433\u0430\u0437\u043E\u0432\u044B\u0439 \u0440\u0430\u0437\u0440\u044F\u0434
-      \u0438\u043B\u0438 \u0445\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0430\u044F
-      \u0440\u0435\u0430\u043A\u0446\u0438\u044F"
+    reasonIfNotCompatible: "\u0420\u0435\u0434\u043A\u043E!"

@@ -14,7 +14,7 @@ public class VisualizationManager : MonoBehaviour
     [Header("Фотоны")]
     public GameObject photonPrefab;
     public RectTransform photonContainer;
-    public int photonCount = 15;
+    public int photonCount = 50;
     
     [Header("Лазерный луч")]
     public LineRenderer laserBeam;
@@ -23,10 +23,12 @@ public class VisualizationManager : MonoBehaviour
     
     [Header("Ссылки")]
     public LaserSimulator simulator;
+
     
     private List<Image> atoms = new List<Image>();
     private List<RectTransform> photons = new List<RectTransform>();
     private float photonTimer = 0;
+    private int currentPhotonIndex = 0;
     
     void Start()
     {
@@ -39,23 +41,16 @@ public class VisualizationManager : MonoBehaviour
         if (laserBeam != null)
         {
             laserBeam.enabled = false;
-            laserBeam.startWidth = 0.1f;
-            laserBeam.endWidth = 0.1f;
-            laserBeam.startColor = Color.yellow;
-            laserBeam.endColor = Color.red;
-            
-            if (laserBeam.material == null)
-                laserBeam.material = new Material(Shader.Find("Sprites/Default"));
+            laserBeam.startWidth = 0.05f;
+            laserBeam.endWidth = 0.05f;
+            laserBeam.startColor = Color.red;
+            laserBeam.endColor = Color.yellow;
         }
     }
     
     void CreateAtoms()
     {
-        if (atomPrefab == null || atomContainer == null)
-        {
-            Debug.LogError("AtomPrefab или AtomContainer не назначен!");
-            return;
-        }
+        if (atomPrefab == null || atomContainer == null) return;
         
         float w = atomContainer.rect.width;
         float h = atomContainer.rect.height;
@@ -70,23 +65,17 @@ public class VisualizationManager : MonoBehaviour
             );
             atoms.Add(atom.GetComponent<Image>());
         }
-        
-        Debug.Log($"Создано атомов: {atoms.Count}");
     }
     
     void CreatePhotons()
     {
-        if (photonPrefab == null || photonContainer == null)
-        {
-            Debug.LogWarning("PhotonPrefab или PhotonContainer не назначен!");
-            return;
-        }
+        if (photonPrefab == null || photonContainer == null) return;
         
         for (int i = 0; i < photonCount; i++)
         {
             GameObject p = Instantiate(photonPrefab, photonContainer);
             RectTransform rect = p.GetComponent<RectTransform>();
-            rect.anchoredPosition = new Vector2(-500, 0); // Все на одной высоте
+            rect.anchoredPosition = new Vector2(-1000, Random.Range(-100, 100));
             photons.Add(rect);
             p.SetActive(false);
         }
@@ -94,47 +83,62 @@ public class VisualizationManager : MonoBehaviour
     
     void OnUpdate(float inversion, bool lasing)
     {
-        // Атомы
+        // Обновление атомов (цвета)
         float t = Mathf.Clamp01(inversion / 2f);
         int excited = Mathf.FloorToInt(atoms.Count * t);
         for (int i = 0; i < atoms.Count; i++)
             if (atoms[i] != null)
                 atoms[i].color = (i < excited) ? excitedColor : normalColor;
         
-        // Фотоны
+        // ========== ФОТОНЫ С ЗАВИСИМОСТЬЮ ОТ ИНВЕРСИИ ==========
         if (lasing)
         {
+            // Чем выше инверсия, тем чаще рождаются фотоны
+            float intensity = Mathf.Clamp01(inversion);
+            float creationInterval = Mathf.Lerp(0.3f, 0.03f, intensity);
+            
             photonTimer += Time.deltaTime;
-            if (photonTimer > 0.03f)
+            if (photonTimer > creationInterval)
             {
                 photonTimer = 0;
-                foreach (var photon in photons)
+                
+                // Запускаем новый фотон
+                for (int i = 0; i < photons.Count; i++)
                 {
-                    if (!photon.gameObject.activeSelf)
+                    if (!photons[i].gameObject.activeSelf)
                     {
-                        photon.gameObject.SetActive(true);
-                        photon.anchoredPosition = new Vector2(-500, 0);
+                        photons[i].gameObject.SetActive(true);
+                        photons[i].anchoredPosition = new Vector2(-500, Random.Range(-20, 20));
                         break;
                     }
+                }
+            }
+            
+            // Двигаем все активные фотоны (скорость тоже зависит от инверсии)
+            float speed = Mathf.Lerp(500f, 2000f, intensity);  // 500 → 2000
+            
+            foreach (var photon in photons)
+            {
+                if (photon.gameObject.activeSelf)
+                {
+                    Vector2 pos = photon.anchoredPosition;
+                    pos.x += speed * Time.deltaTime;
+                    if (pos.x > 600)
+                        photon.gameObject.SetActive(false);
                     else
-                    {
-                        Vector2 pos = photon.anchoredPosition;
-                        pos.x += 80; // Быстрее
-                        if (pos.x > 500)
-                            photon.gameObject.SetActive(false);
-                        else
-                            photon.anchoredPosition = pos;
-                    }
+                        photon.anchoredPosition = pos;
                 }
             }
         }
         else
         {
+            // Скрываем все фотоны при отсутствии генерации
             foreach (var p in photons)
-                if (p.gameObject.activeSelf) p.gameObject.SetActive(false);
+                if (p.gameObject.activeSelf) 
+                    p.gameObject.SetActive(false);
         }
         
-        // Луч
+        // Обновление лазерного луча
         if (laserBeam != null)
         {
             laserBeam.enabled = lasing;
@@ -142,25 +146,6 @@ public class VisualizationManager : MonoBehaviour
             {
                 laserBeam.SetPosition(0, beamStart.position);
                 laserBeam.SetPosition(1, beamEnd.position);
-                Debug.Log($"Луч: {beamStart.position} → {beamEnd.position}");
-            }
-        }
-
-
-        // ТЕСТ ЛУЧА (всегда включён)
-        if (laserBeam != null)
-        {
-            laserBeam.enabled = true;  // принудительно
-            
-            if (beamStart != null && beamEnd != null)
-            {
-                laserBeam.SetPosition(0, beamStart.position);
-                laserBeam.SetPosition(1, beamEnd.position);
-                Debug.Log($"Луч включен! Start: {beamStart.position}, End: {beamEnd.position}");
-            }
-            else
-            {
-                Debug.LogError("beamStart или beamEnd не назначены!");
             }
         }
     }
