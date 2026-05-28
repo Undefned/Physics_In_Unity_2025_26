@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ElectronMovement : MonoBehaviour
 {
-    public float velocity = 0.25f; // скорость в условных единицах (уменьшено в 4 раза для лучшей видимости)
+    public float velocity = 0.15f; // скорость в условных единицах (уменьшено в 4 раза для лучшей видимости)
     public Transform anode;
     public static float voltage = 0f; // задерживающее напряжение
 
