@@ -13,6 +13,9 @@ TagManager:
   - BilliardPocket
   - Particle
   - Anode
+  - Uranium
+  - Neutron
+  - Absorber
   layers:
   - Default
   - TransparentFX
